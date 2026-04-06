@@ -46,8 +46,8 @@ export interface UserDTO {
     password? : string;
     role : Erole;
     status : EUserStatus;
-    createdAt? : string;
-    updatedAt? : string
+    createdAt : string;
+    updatedAt : string
 
 }
 

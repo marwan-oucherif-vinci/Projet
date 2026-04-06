@@ -2,11 +2,12 @@
 // import { EGameStatus, GameDTO, NewGameDTO } from "../models/game.model";
 // import { ESportType, NewTeamDTO, TeamDTO } from "../models/team.model";
 import { EUserStatus, NewUserDTO, UserDTO } from "../models/user.models";
-//import { Erole, UserLoginDTO } from "../models/user.models";
+import { Erole } from "../models/user.models";
+//import {  UserLoginDTO } from "../models/user.models";
 
-// export function isNumber(obj: any): obj is number {
-//   return typeof obj === 'number' && !isNaN(obj) && isFinite(obj);
-// }
+export function isNumber(obj: any): obj is number {
+  return typeof obj === 'number' && !isNaN(obj) && isFinite(obj);
+}
 
 export function isString(obj: any): obj is string {
   return typeof obj === 'string';
@@ -36,24 +37,24 @@ export function isNewUserDTO(obj: any): obj is NewUserDTO {
 //     obj.password && isNonEmptyString(obj.password)
 // }
 
-// export function isUserDTO(obj: any): obj is UserDTO {
-//   return obj && typeof obj === 'object' &&
-//     obj.email && isNonEmptyString(obj.email) &&
-//     obj.firstName && isNonEmptyString(obj.firstName) &&
-//     obj.lastName && isNonEmptyString(obj.lastName) && 
-//     obj.username && isNonEmptyString(obj.username) && 
-//     obj.id !== undefined && isNumber(obj.id) &&
-//     obj.status && isString(obj.status) && isUserStatus(obj.status) && 
-//     obj.role && isString(obj.role) && isUserRole(obj.role)
-// }
+export function isUserDTO(obj: any): obj is UserDTO {
+  return obj && typeof obj === 'object' &&
+    obj.email && isNonEmptyString(obj.email) &&
+    obj.firstName && isNonEmptyString(obj.firstName) &&
+    obj.lastName && isNonEmptyString(obj.lastName) && 
+    obj.username && isNonEmptyString(obj.username) && 
+    obj.id !== undefined && isNumber(obj.id) &&
+    obj.status && isString(obj.status) && isUserStatus(obj.status) && 
+    obj.role && isString(obj.role) && isUserRole(obj.role)
+}
 
-// export function isUserRole(obj: any): obj is ERole {
-//   return Object.values(ERole).includes(obj);
-// }
+export function isUserRole(obj: any): obj is Erole {
+  return Object.values(Erole).includes(obj);
+}
 
-// export function isUserStatus(obj: any): obj is EUserStatus {
-//   return Object.values(EUserStatus).includes(obj);
-// }
+export function isUserStatus(obj: any): obj is EUserStatus {
+  return Object.values(EUserStatus).includes(obj);
+}
 
 // // == TEAM ==
 // export function isESportType(obj: any): obj is ESportType {

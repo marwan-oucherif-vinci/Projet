@@ -1,4 +1,4 @@
-import { User, UserDBO, UserDTO, UserShortDTO } from "../models/user.models";
+import { NewUser, NewUserDTO, User, UserDBO, UserDTO, UserShortDTO } from "../models/user.models";
 
 export class UsersMapper {
     static fromDBO(dbo : UserDBO): User{
@@ -55,6 +55,33 @@ export class UsersMapper {
         
 
         
+        }
+    }
+    static fromNewUserDTO(newDTO : NewUserDTO) : NewUser {
+        return {
+            firstName : newDTO.firstName,
+            lastName : newDTO.lastName,
+            email : newDTO.email,
+            username : newDTO.username,
+            password : newDTO.password
+
+        }
+    }
+
+
+    public static fromDTO(dto:UserDTO) : User {
+        return {
+            id : dto.id,
+            email : dto.email,
+            firstName : dto.firstName,
+            lastName : dto.lastName,
+            username : dto.username,
+            password : dto.password || "",
+            role : dto.role,
+            status : dto.status,
+            createdAt : new Date(dto.createdAt),
+            updatedAt : new Date(dto.updatedAt)
+
         }
     }
 
