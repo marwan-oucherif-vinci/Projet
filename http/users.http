@@ -15,15 +15,34 @@ Content-Type: application/json
    "password" : "Souf1210"
 }
 
+
+###
+# POST with error
+POST http://localhost:3000/users HTTP/1.1
+Content-Type: application/json
+
+{
+   "lastName" : "Sofiane",
+   "email" : "Souf@gmail.com",
+   "username" : "Souf",
+   "password" : "Souf1210"
+}
+
 ###
 # GET an user by his username 
+ GET http://localhost:3000/users/username/bob HTTP/1.1
+
+ 
+###
+# GET an user by his username with error
  GET http://localhost:3000/users/username/Lolo HTTP/1.1
- // dans le swagger on renvoie un mdp moi nan avec le mapper toDTO
+
+
 
 ###
  # GET an user by his email
  GET http://localhost:3000/users/email/Lolo@gmail.com
-// dans le swaagger on renvoie un mdp moi nan avec le mapper toDTO
+ 
 
 ###
 # GET an user by his id 
@@ -56,4 +75,4 @@ PATCH  http://localhost:3000/users/1/role/admin
 
 ###
 #PATCH 
-PATCH http://localhost:3000/users/1/reactivate
+PATCH http://localhost:3000/users/999/reactivate

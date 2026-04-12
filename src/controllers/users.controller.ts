@@ -4,7 +4,6 @@ import { UsersService } from "../services/users.service";
 import { UsersMapper } from "../mappers/users.mapper";
 import { Erole, NewUserDTO, User, UserDTO, UserShortDTO } from "../models/user.models";
 import { isNewUserDTO, isString, isUserDTO } from "../utils/guards";
-import { error } from "node:console";
 
 export const usersController = Router();
 
@@ -32,7 +31,7 @@ usersController.post('/',(req:Request, res:Response)=>{
             return res.status(400).send();
         }
 
-        // je comprend pas trop bien cette ligne 
+        // je comprend pas trop bien cette ligne pq jpx pas faire un fromUserDO
         const user : User | undefined = UsersService.create(UsersMapper.fromNewUserDTO(userDTO))
         if(!user){
             LoggerService.error('User not created')

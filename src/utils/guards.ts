@@ -1,6 +1,7 @@
 // import { FieldDTO, NewFieldDTO } from "../models/field.model";
 // import { EGameStatus, GameDTO, NewGameDTO } from "../models/game.model";
 // import { ESportType, NewTeamDTO, TeamDTO } from "../models/team.model";
+import { ESportType } from "../models/team.model";
 import { EUserStatus, NewUserDTO, UserDTO } from "../models/user.models";
 import { Erole } from "../models/user.models";
 //import {  UserLoginDTO } from "../models/user.models";
@@ -56,17 +57,17 @@ export function isUserStatus(obj: any): obj is EUserStatus {
   return Object.values(EUserStatus).includes(obj);
 }
 
-// // == TEAM ==
-// export function isESportType(obj: any): obj is ESportType {
-//   return Object.values(ESportType).includes(obj);
-// }
+// == TEAM ==
+export function isESportType(obj: any): obj is ESportType {
+  return Object.values(ESportType).includes(obj);
+}
 
-// export function isNewTeamDTO(obj: any): obj is NewTeamDTO {
-//   return obj && typeof obj === 'object' &&
-//     obj.name && isNonEmptyString(obj.name) && 
-//     obj.sportType && isString(obj.sportType) && isESportType(obj.sportType) && 
-//     (!obj.description || isString(obj.description))
-// }
+export function isNewTeamDTO(obj: any): obj is NewUserDTO {
+  return obj && typeof obj === 'object' &&
+    obj.name && isNonEmptyString(obj.name) && 
+    obj.sportType && isString(obj.sportType) && isESportType(obj.sportType) && 
+    (!obj.description || isString(obj.description))
+}
 
 // export function isTeamDTO(obj: any): obj is TeamDTO {
 //   return obj && typeof obj === 'object' && 

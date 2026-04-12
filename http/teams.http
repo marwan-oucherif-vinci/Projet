@@ -1,0 +1,15 @@
+###
+# GET All teams 
+GET http://localhost:3000/teams/
+
+###
+# POST a new team
+POST http://localhost:3000/teams/
+Content-Type: application/json
+
+{
+  "name": "Red Dragons",
+  "description": "A competitive football team",
+  "sportType": "football"
+}
+
