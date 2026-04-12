@@ -13,3 +13,35 @@ Content-Type: application/json
   "sportType": "football"
 }
 
+###
+# GET a team with an id 
+GET http://localhost:3000/teams/999
+
+
+###
+# Update an team with id
+PUT http://localhost:3000/teams/999
+Content-Type : application/json
+
+{
+  "id": 999,
+  "name": "Red Dragons FC",
+  "description": "Updated description",
+  "sportType": "football",
+  "players": [
+      2,
+      3,
+      10
+    ],
+  "trainerId": 5
+}
+
+###
+# Join a team 
+PATCH http://localhost:3000/teams/999/join
+Content-Type: application/json
+
+###
+# Leave a team 
+PATCH http://localhost:3000/teams/2/leave
+Content-Type: application/json

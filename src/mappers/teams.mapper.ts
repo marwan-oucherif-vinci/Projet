@@ -61,7 +61,22 @@ export class TeamsMapper {
                         updatedAt : team.updatedAt    
                        }
 
-                    }}
+                    }
+
+                    public static fromDTO(dto:TeamDTO) : Team {
+                            return {
+                                 id: dto.id,
+                                   name : dto.name,
+                                   description : dto.description,
+                                   sportType : dto.sportType,
+                                   players : dto.players,
+                                   trainerId : dto.trainerId,
+                                   createdAt : new Date(dto.createdAt),
+                                   updatedAt : new Date(dto.updatedAt)
+                            }
+                        }
+                    
+                    }
 
 
 
