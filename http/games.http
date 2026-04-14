@@ -1,0 +1,4 @@
+###
+# GEt list of gameShortDtO
+GET http://localhost:3000/games
+

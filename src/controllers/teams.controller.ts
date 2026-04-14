@@ -90,6 +90,7 @@ teamsController.patch('/:id/join',(req:Request,res:Response)=>{
     const userId = 1 // faudra changer ça avec le auth, la je brut code 
     const result = TeamsService.joinTeam(teamId,userId);
 
+    
     if(result === "ALREADY_IN"){
         LoggerService.error("User is already in the team");
         return res.status(400).json({error: `User ${userId} is already in the team ${teamId}`})

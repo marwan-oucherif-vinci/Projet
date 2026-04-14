@@ -1,6 +1,7 @@
 import express, { type Express } from 'express'
 import { usersController } from './controllers/users.controller';
 import { teamsController } from './controllers/teams.controller';
+import { gamesController } from './controllers/games.controller';
 
 export const app : Express = express();
 
@@ -28,3 +29,4 @@ app.get('/', (req, res) => {
 //use the controlelr to use the route 
 app.use('/users', usersController);
 app.use('/teams', teamsController);
+app.use('/games', gamesController);
