@@ -1,6 +1,7 @@
 import { FieldsMapper } from "../mappers/fields.mapper";
 import { Field, FieldDBO, FieldDTO, NewField, NewFieldDTO } from "../models/field.model";
 import { Game } from "../models/game.model";
+import { Team } from "../models/team.model";
 import { UserDBO } from "../models/user.models";
 import { FilesService } from "./files.service";
 import { LoggerService } from "./logger.service";
@@ -69,4 +70,18 @@ export class FieldsService {
         return newField;
 
     } 
+
+
+    public static getById(id : number) : Field | undefined {
+        const fieldsDB : Field []  = this.readFieldsDB();
+
+        for (const field of fieldsDB) {
+            if(field.id === id){
+                return field;
+            }
+        }
+         return undefined;                                           
+    }
+
+
 }

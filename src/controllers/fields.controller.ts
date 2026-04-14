@@ -4,6 +4,8 @@ import { FieldsService } from "../services/fields.service";
 import { FieldsMapper } from "../mappers/fields.mapper";
 import { Field, FieldDTO, NewFieldDTO } from "../models/field.model";
 import { isNewFieldDTO } from "../utils/guards";
+import { error } from "node:console";
+import { TeamsService } from "../services/teams.service";
 
 export const fieldsController = Router();
 
@@ -35,3 +37,25 @@ fieldsController.post('/',(req:Request,res:Response)=>{
     return res.status(201).json(FieldsMapper.toDTO(field));
     // je fais juste ça ? (corriger toute les erreurs)
 })
+
+
+fieldsController.get('/:id',(req:Request,res:Response)=>{
+LoggerService.info("[GET] /fields/:id");
+const id = Number(req.params.id)
+
+if(isNaN(id)){
+    LoggerService.error("Invalid id")
+    return res.status(400).json({error: `Invalid id : ${id}` })
+}
+const field = FieldsService.getById(id);
+if(!field){
+    LoggerService.error("Field not found");
+    return res.status(404).json({error: `Field ${field} with id ${id} not found`})
+}
+return res.status(200).json(FieldsMapper.toDTO(field));
+
+})
+
+
+
+fieldsController.put('')

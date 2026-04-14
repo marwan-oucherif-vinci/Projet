@@ -3,7 +3,7 @@
 GET http://localhost:3000/fields/
 
 ###
-# Create a newx field
+# Create a new field
 POST http://localhost:3000/fields
 Content-Type : Application/json
 
@@ -11,3 +11,7 @@ Content-Type : Application/json
     "name" : "Marw",
     "location" : "Bruxelles"
 }
+
+###
+# Get a field with his id 
+GET http://localhost:3000/fields/1
