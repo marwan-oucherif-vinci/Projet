@@ -1,4 +1,4 @@
-// import { FieldDTO, NewFieldDTO } from "../models/field.model";
+import { FieldDTO, NewFieldDTO } from "../models/field.model";
 // import { EGameStatus, GameDTO, NewGameDTO } from "../models/game.model";
 // import { ESportType, NewTeamDTO, TeamDTO } from "../models/team.model";
 import { ESportType } from "../models/team.model";
@@ -107,12 +107,12 @@ export function isNewTeamDTO(obj: any): obj is NewUserDTO {
 //   return Object.values(EGameStatus).includes(obj);
 // }
 
-// // == Field ==
-// export function isNewFieldDTO(obj: any): obj is NewFieldDTO {
-//   return obj && typeof obj === 'object' && 
-//     obj.name && isNonEmptyString(obj.name) &&  
-//     obj.location && isNonEmptyString(obj.location);
-// }
+// == Field ==
+export function isNewFieldDTO(obj: any): obj is NewFieldDTO {
+  return obj && typeof obj === 'object' && 
+    obj.name && isNonEmptyString(obj.name) &&  
+    obj.location && isNonEmptyString(obj.location);
+}
 
 // export function isFieldDTO(obj: any): obj is FieldDTO {
 //   return obj && typeof obj === 'object' && 

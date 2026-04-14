@@ -1,0 +1,13 @@
+###
+# Get a list of fieldsDTO
+GET http://localhost:3000/fields/
+
+###
+# Create a newx field
+POST http://localhost:3000/fields
+Content-Type : Application/json
+
+{
+    "name" : "Marw",
+    "location" : "Bruxelles"
+}
