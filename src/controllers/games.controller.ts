@@ -17,3 +17,9 @@ gamesController.get('/',(req:Request,res:Response)=>{
     return res.status(200).json(gamesDTO);
 })
 
+gamesController.post('/',(req:Request,res:Response)=>{
+    LoggerService.info("[POST] /games");
+    const 
+})
+
+

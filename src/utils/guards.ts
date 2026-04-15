@@ -18,7 +18,7 @@ export function isString(obj: any): obj is string {
 //   return typeof obj === 'object';
 // }
 
-function isNonEmptyString(obj: any): obj is string {
+export function isNonEmptyString(obj: any): obj is string {
   return isString(obj) && obj.trim().length !== 0;
 }
 
@@ -114,9 +114,9 @@ export function isNewFieldDTO(obj: any): obj is NewFieldDTO {
     obj.location && isNonEmptyString(obj.location);
 }
 
-// export function isFieldDTO(obj: any): obj is FieldDTO {
-//   return obj && typeof obj === 'object' && 
-//     obj.id !== undefined && isNumber(obj.id) &&
-//     obj.name && isNonEmptyString(obj.name) &&  
-//     obj.location && isNonEmptyString(obj.location);
-// }
+export function isFieldDTO(obj: any): obj is FieldDTO {
+  return obj && typeof obj === 'object' && 
+    obj.id !== undefined && isNumber(obj.id) &&
+    obj.name && isNonEmptyString(obj.name) &&  
+    obj.location && isNonEmptyString(obj.location);
+}

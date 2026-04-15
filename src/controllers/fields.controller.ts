@@ -3,7 +3,7 @@ import { LoggerService } from "../services/logger.service";
 import { FieldsService } from "../services/fields.service";
 import { FieldsMapper } from "../mappers/fields.mapper";
 import { Field, FieldDTO, NewFieldDTO } from "../models/field.model";
-import { isNewFieldDTO } from "../utils/guards";
+import { isFieldDTO, isNewFieldDTO, isNonEmptyString } from "../utils/guards";
 import { error } from "node:console";
 import { TeamsService } from "../services/teams.service";
 
@@ -33,6 +33,10 @@ fieldsController.post('/',(req:Request,res:Response)=>{
     }
 
     const field : Field | undefined = FieldsService.create(FieldsMapper.fromNewFieldDTO(fieldDTO))
+    if(!field) {
+        LoggerService.error("")
+        return res.status(404).send("")
+    }
 
     return res.status(201).json(FieldsMapper.toDTO(field));
     // je fais juste ça ? (corriger toute les erreurs)
@@ -61,18 +65,31 @@ return res.status(200).json(FieldsMapper.toDTO(field));
 fieldsController.put('/:id',(req:Request,res:Response)=>{
     LoggerService.info("[PUT] /fields/:id")
     const id = Number(req.params.id)
-    const fieldInfo = req.body;
+    const fieldInfo : FieldDTO = req.body;
 
    
 if(isNaN(id)){
     LoggerService.error("Invalid id")
     return res.status(400).json({error: `Invalid id : ${id}` })
 }
+if(!isFieldDTO(fieldInfo)){
+    LoggerService.error("Invaid payload")
+    return res.status(400).json({error : "invalid payload : " + JSON.stringify(fieldInfo)})
+    
+}
 if(id !== fieldInfo.id){
     LoggerService.error("Id missmatch between body and path")
     return res.status(400).json({error : `Id missmatch between body and path`})
 }
 const result = FieldsService.update(FieldsMapper.fromDTO(fieldInfo)) 
+
+if(!result) {
+    LoggerService.error("Field not found")
+    return res.status(404).json({error : `Field with id ${fieldInfo.id} not found`})
+}
+return res.status(200).json(FieldsMapper.toDTO(result));
+
+
 
  
 })

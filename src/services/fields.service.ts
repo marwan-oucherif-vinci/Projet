@@ -5,6 +5,7 @@ import { Team } from "../models/team.model";
 import { UserDBO } from "../models/user.models";
 import { FilesService } from "./files.service";
 import { LoggerService } from "./logger.service";
+import { TeamsService } from "./teams.service";
 
 export class FieldsService {
     private static dbPath = './data/fields.json'
@@ -82,6 +83,29 @@ export class FieldsService {
         }
          return undefined;                                           
     }
+
+    public static update(updatedField : Field) : Field | undefined {
+        const fields : Field [] = FieldsService.readFieldsDB();
+        let index = -1;
+        for (let I = 0; I < fields.length; I++) {
+            if(fields[I].id === updatedField.id){
+                index = I;
+                break;
+            }
+    }
+    if(index === -1) return undefined;
+
+    updatedField.createdAt = fields[index].createdAt;
+    updatedField.updatedAt = new Date();
+
+    fields[index] = updatedField;
+
+    if(!FieldsService.writeFieldsDB(fields)){
+        return undefined;
+    }
+    return updatedField;
+}
+    
 
 
 }
