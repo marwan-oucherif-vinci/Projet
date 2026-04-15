@@ -58,4 +58,21 @@ return res.status(200).json(FieldsMapper.toDTO(field));
 
 
 
-fieldsController.put('')
+fieldsController.put('/:id',(req:Request,res:Response)=>{
+    LoggerService.info("[PUT] /fields/:id")
+    const id = Number(req.params.id)
+    const fieldInfo = req.body;
+
+   
+if(isNaN(id)){
+    LoggerService.error("Invalid id")
+    return res.status(400).json({error: `Invalid id : ${id}` })
+}
+if(id !== fieldInfo.id){
+    LoggerService.error("Id missmatch between body and path")
+    return res.status(400).json({error : `Id missmatch between body and path`})
+}
+const result = FieldsService.update(FieldsMapper.fromDTO(fieldInfo)) 
+
+ 
+})
