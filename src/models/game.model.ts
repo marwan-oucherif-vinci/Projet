@@ -24,8 +24,8 @@ export interface GameDTO {
     homeScore? : number,
     awayScore? :  number,
     scheduledDate? : string,
-    createdAt? : Date,
-    updatedAt? : Date
+    createdAt? : string,
+    updatedAt? : string
 }
 
 export interface GameShortDTO {
@@ -60,4 +60,23 @@ export interface GameDBO {
     created_at : string,
     updated_at : string
     
+}
+
+export interface NewGameDTO {
+    name : string,
+    fieldId : number,
+    refereeId : number, 
+    homeTeamId : number,
+    awayTeamId : number,
+    scheduledDate : string
+}
+
+
+export interface NewGame {
+     name? : string,
+    fieldId? : number,
+    refereeId? : number, 
+    homeTeamId? : number,
+    awayTeamId? : number,
+    scheduledDate? : string
 }

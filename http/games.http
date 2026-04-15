@@ -4,3 +4,11 @@ GET http://localhost:3000/games
 
 ###
 # Create a new game
+POST http://localhost:3000/games/
+Content-Type: application/json
+
+{
+    "name": "fcb vs me",
+    "homeTeamId": 2,
+    "awayTeamId":1
+}
