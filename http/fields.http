@@ -21,9 +21,8 @@ GET http://localhost:3000/fields/1
 PUT http://localhost:3000/fields/999
 Content-Type: application/json
 
-{
+{}
     "id": 999,
     "name": "Skrrrrrr",
-    "location": "StJosse"
-
+    "location": "StJosse
 }

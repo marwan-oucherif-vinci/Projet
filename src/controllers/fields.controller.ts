@@ -89,7 +89,5 @@ if(!result) {
 }
 return res.status(200).json(FieldsMapper.toDTO(result));
 
-
-
  
 })
