@@ -55,12 +55,13 @@ export class GamesService {
         if (game.fieldId && game.scheduledDate){
             initialStatus = EGameStatus.SCHEDULDED;
         }
+
         const newGame : Game = {
             id : gamesDB.length + 1,
             status : initialStatus,
             name : game.name,
-            fieldId : game.fieldId || 0, //est-ce que c'est bon d'écrire ça ici ?
-            refereeId : game.refereeId || 1,
+            fieldId : game.fieldId, 
+            refereeId : game.refereeId,
             homeTeamId : game.homeTeamId,
             awayTeamId : game.awayTeamId,
             scheduledDate : game.scheduledDate,
@@ -77,5 +78,20 @@ export class GamesService {
         }
         return newGame;
 
+    }
+
+
+    public static getById(gameId : Number) : Game | undefined {
+        const gamedDB = this.readGamesDB();
+
+        for (let i = 0; i < gamedDB.length; i++) {
+            if(gamedDB[i].id === gameId){
+                return gamedDB[i]
+            }
+            
+        }
+        return undefined;
+
+       
     }
 }

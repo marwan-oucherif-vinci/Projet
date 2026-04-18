@@ -18,11 +18,11 @@ GET http://localhost:3000/fields/1
 
 ###
 # Update a field
-PUT http://localhost:3000/fields/999
+PUT http://localhost:3000/fields/1
 Content-Type: application/json
 
-{}
-    "id": 999,
-    "name": "Skrrrrrr",
-    "location": "StJosse
+{
+    "id" : 1,
+    "name": "Mrnnn",
+    "location": "scucusuu"
 }

@@ -81,4 +81,22 @@ export class GamesMapper {
 
         }
     }
+
+    static fromDTO(dto : GameDTO) : Game {
+        return {
+              id : dto.id,
+            status : dto.status,
+            name : dto.name,
+            fieldId : dto.fieldId,
+            refereeId : dto.refereeId,
+            homeTeamId : dto.homeTeamId,
+            awayTeamId : dto.awayTeamId,
+            homeScore : dto.homeScore,
+            awayScore : dto.awayScore,
+            scheduledDate : dto.scheduledDate,
+            updatedAt : new Date(),
+
+
+        }
+    }
 }

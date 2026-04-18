@@ -12,3 +12,7 @@ Content-Type: application/json
     "homeTeamId": 2,
     "awayTeamId":1
 }
+
+###
+# Get a game with his id 
+GET http://localhost:3000/games/3/

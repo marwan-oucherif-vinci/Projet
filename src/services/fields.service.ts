@@ -84,6 +84,7 @@ export class FieldsService {
          return undefined;                                           
     }
 
+    
     public static update(updatedField : Field) : Field | undefined {
         const fields : Field [] = FieldsService.readFieldsDB();
         let index = -1;
