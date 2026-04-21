@@ -22,6 +22,7 @@ export class GamesMapper {
 
         }
     }
+    
 
     static toDBO(game : Game ) : GameDBO {
         return {
