@@ -59,3 +59,4 @@ gamesController.get('/:id',(req:Request,res:Response)=>{
 
     
 })
+

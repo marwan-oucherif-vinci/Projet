@@ -33,11 +33,11 @@ export function isNewUserDTO(obj: any): obj is NewUserDTO {
     obj.username && isNonEmptyString(obj.username)
 }
 
-// export function isUserLoginDTO(obj: any): obj is UserLoginDTO {
-//   return obj && typeof obj === 'object' &&
-//     obj.username && isNonEmptyString(obj.username) &&
-//     obj.password && isNonEmptyString(obj.password)
-// }
+export function isUserLoginDTO(obj: any): obj is UserLoginDTO {
+  return obj && typeof obj === 'object' &&
+    obj.username && isNonEmptyString(obj.username) &&
+    obj.password && isNonEmptyString(obj.password)
+}
 
 export function isUserDTO(obj: any): obj is UserDTO {
   return obj && typeof obj === 'object' &&

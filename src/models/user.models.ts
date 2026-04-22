@@ -69,3 +69,21 @@ export interface NewUser {
     username : string;
     password : string;
 }
+
+export interface UserLoginDTO {
+    username : string;
+    password : string;
+}
+
+export interface AuthentificatedUser {
+    username : string,
+    token : string,
+    role : Erole;
+} 
+
+export interface AuthentificatedUserDTO {
+    username : string,
+    token : string,
+    role : Erole;
+} 
+
