@@ -235,4 +235,8 @@ public static reactivate(id:number):User |undefined {
         return data[index];
 
 }
+
+static validateUser(password : string, passwordHash: string) : boolean {
+    return bcrypt.compareSync(password,passwordHash);
+}
 }

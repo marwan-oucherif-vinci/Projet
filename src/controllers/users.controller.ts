@@ -4,20 +4,40 @@ import { UsersService } from "../services/users.service";
 import { UsersMapper } from "../mappers/users.mapper";
 import { Erole, NewUserDTO, User, UserDTO, UserShortDTO } from "../models/user.models";
 import { isNewUserDTO, isString, isUserDTO } from "../utils/guards";
+import { AuthService } from "../services/auth.service";
+import { AuthenficatedRequest } from "../models/auth.model";
 
 export const usersController = Router();
 
-usersController.get('/',(req:Request, res: Response)=>{
+usersController.get('/', AuthService.authorize, (req:AuthenficatedRequest, res: Response)=>{
     LoggerService.info('[GET] /users/');
+    const loggedInUser = req.user;
+    if (!loggedInUser) return res.sendStatus(401);
+
+
     const users = UsersService.getAll(); 
-    const usersDTO : UserShortDTO [] = []
+
+
+    
+    const usersDTO = []
+    if(loggedInUser.role === Erole.ADMIN){
+    for (let i = 0; i < users.length; i++) {
+        usersDTO.push(UsersMapper.toDTO(users[i]))
+        return res.status(200).json(usersDTO);
+        
+    }
+        
+    }
     for (let i = 0; i < users.length; i++) {
         usersDTO.push(UsersMapper.toShortDTO(users[i]))
+        return res.status(200).json(usersDTO);
         
     
         
     }
-    return res.status(200).json(usersDTO);
+    
+
+
 
 })
 

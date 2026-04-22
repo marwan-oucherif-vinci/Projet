@@ -40,7 +40,7 @@ export interface GameShortDTO {
 
 export enum EGameStatus {
     CREATED = 'created',
-    SCHEDULDED = 'schedulded',
+    SCHEDULED = 'scheduled',
     STARTED = 'started',
     FINISHED = 'finished',
     CANCELLED = 'cancelled'

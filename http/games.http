@@ -8,7 +8,7 @@ POST http://localhost:3000/games/
 Content-Type: application/json
 
 {
-    "name": "fcb vs me",
+    "name": "po vs lice",
     "homeTeamId": 2,
     "awayTeamId":1
 }
@@ -19,16 +19,34 @@ GET http://localhost:3000/games/3/
 
 ###
 # update a game with his id 
-PUT http://localhost:3000/games/2
+PUT http://localhost:3000/games/3
 Content-Type: application/json
 
 {
-    "id": 2,
-    "name" : "FC MRN vs FC mYSS",
-    "status" : "finished",
-    "homeTeamId": 1,
-    "awayTeamId": 2,
-    "scheduledDate": "2025-06-15T14:00:00.000Z"
+    "id": 3,
+    "name" : "FC MMMM vs FC SSSSSS",
+    "status" : "created",
+    "homeTeamId": 2,
+    "awayTeamId": 1,
+    "homeScore": 0,
+    "awayScore": 0,
+    "scheduledDate": "2026-06-11T14:00:00.000Z",
+    "fieldId": 1
+}
+
+###
+# update a game with his id 
+PUT http://localhost:3000/games/5
+Content-Type: application/json
+
+{
+    "id": 5,
+    "name" : "ra vo ro",
+    "status" : "created",
+    "homeTeamId": 2,
+    "awayTeamId": 1,
+    "scheduledDate": "2027-06-15T14:00:00.000Z",
+    "fieldId": 1
 }
 
 ###
@@ -37,10 +55,15 @@ DELETE http://localhost:3000/games/3
 
 ###
 # Update the score of a team in a game 
-PATCH http://localhost:3000/games/4/score/y/a
+PATCH http://localhost:3000/games/3/score/4/4
 
 ###
 # Update the status of a game 
 PATCH http://localhost:3000/games/7/status/cancelled
+
+
+###
+# Update the status of a game 
+PATCH http://localhost:3000/games/4/status/created
 
   

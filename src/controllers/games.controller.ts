@@ -28,6 +28,7 @@ gamesController.post('/',(req:Request,res:Response)=>{
         LoggerService.error("Invalid or missing fields")
         return res.status(400).send();
     }
+    gameDTO.refereeId = 1;
     const game : Game | undefined = GamesService.create(GamesMapper.fromNewGameDTO(gameDTO)) 
 
     if(!game){
@@ -85,11 +86,10 @@ gamesController.put('/:id',(req:Request,res:Response)=>{
    
     if(gameUpdated === undefined){
       LoggerService.error("Game not found");
-      return res.status(404).json({error : `Game with id ${id} not found`})    
+      return res.status(404).json({error : `Cannot update the score of game ${id}`})    
     }
 
     return res.status(200).json(GamesMapper.toDTO(gameUpdated));
-        // mes test http ne fonctionnent pas bien je crois 
 
 
 })
@@ -146,5 +146,4 @@ gamesController.patch("/:id/status/:status",(req:Request,res:Response)=>{
         return res.status(400).json({error : `Invalid or disallowed status transition, or missing prerequisites for starting`})
     }
     return res.status(200).json(GamesMapper.toDTO(gameUpdated))
-    // transition d'un etat vers lui meme ça renvoie toute la game ou je dois meme ça annulé et aussi regarder le service pour voir si la manier dont j'ai fais est bonne 
 })
