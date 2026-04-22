@@ -94,4 +94,131 @@ export class GamesService {
 
        
     }
+
+
+
+    public static update(game : Game ) : Game | undefined {
+        const gamesDB = this.readGamesDB();
+        let index = -1;
+
+       for (let i = 0; i < gamesDB.length; i++) {
+       if(gamesDB[i].id === game.id){
+        index = i;
+        break;
+    }
+   }
+   
+   if(index === -1)return undefined;
+   
+   if (gamesDB[index].status === EGameStatus.FINISHED || gamesDB[index].status === EGameStatus.CANCELLED){
+    return undefined;
+   }
+   if(game.status === EGameStatus.STARTED){
+   game.fieldId= gamesDB[index].fieldId;
+   game.refereeId = gamesDB[index].refereeId;
+   game.homeTeamId = gamesDB[index].homeTeamId;
+   game.awayTeamId = gamesDB[index].awayTeamId;
+   game.status = EGameStatus.STARTED;
+  
+ 
+   }
+     game.createdAt = gamesDB[index].createdAt;
+    game.updatedAt = new Date(); 
+    gamesDB[index] = game;
+
+   if(!GamesService.writeGamesDB(gamesDB)){
+    return undefined;
+   }
+   return game;
+}
+
+
+public static delete (id:Number) : boolean | undefined {
+    const gamedDB : Game [] = GamesService.readGamesDB();
+    let indx = -1;
+    for (let index = 0; index < gamedDB.length; index++) {
+       if(id === gamedDB[index].id){
+            indx = index;
+            break;
+       }
+        
+    }
+    if(indx === -1) return undefined;
+
+    gamedDB.splice(indx,1);
+
+    if(!GamesService.writeGamesDB(gamedDB)){
+        return false;
+    }
+    return true;
+
+
+}
+
+public static updateScore(id:number,homeScore : number, awayScore : number) : Game | undefined{
+    const gamesDB = GamesService.readGamesDB();
+    let index = -1;
+    for (let i = 0; i < gamesDB.length; i++) {
+        if(gamesDB[i].id === id){
+            index = i;
+            break;
+        }
+    }
+    if(index === -1) return undefined;
+
+    if(gamesDB[index].status !== EGameStatus.STARTED) return undefined;
+           
+    gamesDB[index].homeScore = homeScore;
+    gamesDB[index].awayScore = awayScore; 
+    gamesDB[index].updatedAt = new Date();
+    
+    if(!this.readGamesDB){
+        return undefined;
+    }
+    return gamesDB[index];
+
+    
+}
+
+public static updateGameStatus(id:number,status : EGameStatus) : Game | undefined{
+    const gamesDB = this.readGamesDB();
+    let index = -1;
+    for (let i = 0; i < gamesDB.length; i++) {
+        if(gamesDB[i].id === id){
+            index = i;
+            break;
+        }
+    }
+    if(index === -1) return undefined;
+    
+    let isTransitionAllowed = false; 
+
+    if(gamesDB[index].status === EGameStatus.CREATED && status === EGameStatus.CANCELLED){
+        isTransitionAllowed = true
+    }
+    if(gamesDB[index].status === EGameStatus.SCHEDULDED && status === EGameStatus.STARTED){
+        if(gamesDB[index].fieldId && gamesDB[index].refereeId && gamesDB[index].homeTeamId && gamesDB[index].awayTeamId && gamesDB[index].homeScore === 0 && gamesDB[index].awayScore === 0){
+                isTransitionAllowed = true;
+        }
+
+    }
+    
+    if(gamesDB[index].status === EGameStatus.SCHEDULDED && status === EGameStatus.CANCELLED){
+        isTransitionAllowed = true;
+    }
+    if(gamesDB[index].status === EGameStatus.STARTED && status === EGameStatus.FINISHED){
+        isTransitionAllowed = true;
+    }
+
+    if(!isTransitionAllowed){
+        return undefined;
+    }
+    gamesDB[index].status = status;
+    gamesDB[index].updatedAt = new Date();
+
+    if(!this.writeGamesDB(gamesDB)){
+        return undefined;
+    }
+    return gamesDB[index];
+}
 }
