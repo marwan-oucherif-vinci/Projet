@@ -3,7 +3,7 @@ import { LoggerService } from "../services/logger.service";
 import { GamesService } from "../services/games.service";
 import { EGameStatus, Game, GameDTO, GameShortDTO, NewGameDTO } from "../models/game.model";
 import { GamesMapper } from "../mappers/games.mapper";
-import { isGameDTO, isNewGameDTO } from "../utils/guards";
+import { isEGameStatus, isGameDTO, isNewGameDTO } from "../utils/guards";
 import { error } from "node:console";
 import { request } from "node:http";
 
@@ -137,8 +137,9 @@ gamesController.patch("/:id/score/:homeScore/:awayScore",(req:Request,res:Respon
 
 gamesController.patch("/:id/status/:status",(req:Request,res:Response)=>{
     LoggerService.info("[PATCH] /games/:id/status/:status");
-    const id = Number(req.params.id);
-    const status : EGameStatus = req.params.status as EGameStatus; // on a pas vu le as comment on fait alors ? 
+    const id = Number(req.params.id);       
+    const status : EGameStatus = req.params.status as EGameStatus // on a pas vu le as comment on fait alors ? 
+    
     
     const gameUpdated = GamesService.updateGameStatus(id,status)
     if(!gameUpdated){

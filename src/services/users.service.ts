@@ -166,9 +166,6 @@ export class UsersService {
         if(index === -1){
             return undefined;
         }
-        if(data[index].role === Erole.ADMIN){
-            return undefined;
-        }
 
         data[index].status = EUserStatus.INACTIVE;
         data[index].updatedAt = new Date();

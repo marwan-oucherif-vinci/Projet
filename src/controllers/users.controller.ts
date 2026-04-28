@@ -1,4 +1,4 @@
-import { Router,Response, Request } from "express";
+import e, { Router,Response, Request } from "express";
 import { LoggerService } from "../services/logger.service";
 import { UsersService } from "../services/users.service";
 import { UsersMapper } from "../mappers/users.mapper";
@@ -6,6 +6,7 @@ import { Erole, NewUserDTO, User, UserDTO, UserShortDTO } from "../models/user.m
 import { isNewUserDTO, isString, isUserDTO } from "../utils/guards";
 import { AuthService } from "../services/auth.service";
 import { AuthenficatedRequest } from "../models/auth.model";
+import { error, log } from "node:console";
 
 export const usersController = Router();
 
@@ -65,9 +66,9 @@ usersController.post('/',(req:Request, res:Response)=>{
 })
 
 
-usersController.get('/username/:username',(req:Request,res:Response)=>{
+usersController.get('/username/:username',AuthService.authorize,(req:AuthenficatedRequest,res:Response)=>{
     LoggerService.info('[GET] /users/username/:username');
-
+    const loggedInUser = req.user;
     const username = req.params.username;
     if(!isString(username)){
         //dans le swagger on nous dis pas de faire error 400?
@@ -75,6 +76,7 @@ usersController.get('/username/:username',(req:Request,res:Response)=>{
         return res.status(400).json({error: `Invalid username: ${username}`});
     }
 
+    if(loggedInUser?.role === Erole.ADMIN || loggedInUser?.role === Erole.REFEREE){
     const result : User | undefined = UsersService.getByUsername(username);
 
     if(!result){
@@ -84,17 +86,20 @@ usersController.get('/username/:username',(req:Request,res:Response)=>{
     // dois-je réelement renvoyer sous toDTO ? car dans la solution du prof n'a pas fait ça
     LoggerService.info("User found")
     return res.status(200).json(UsersMapper.toDTO(result));
-})
+} })
 
-usersController.get('/email/:email',(req:Request,res:Response)=>{
+usersController.get('/email/:email',AuthService.authorize,(req:AuthenficatedRequest,res:Response)=>{
     LoggerService.info('[GET] /email/email');
+    const email = req.params.email;       
+    const loggedInUser = req.user;
 
-    const email = req.params.email;
     if(!isString(email)){
         // la meme qu'en haut
         LoggerService.error('Invalid email');
         return res.status(400).json({error : `Invalid email: ${email}`})
     }
+
+    if(loggedInUser?.role === Erole.ADMIN || loggedInUser?.role === Erole.REFEREE){
 
     const result : User | undefined = UsersService.getByEmail(email);
     if(!result){
@@ -103,28 +108,34 @@ usersController.get('/email/:email',(req:Request,res:Response)=>{
     }
     LoggerService.info("User found")
     return res.status(200).json(UsersMapper.toDTO(result));
-    })
+   } })
 
 
-usersController.get('/:id',(req:Request,res:Response)=>{
+usersController.get('/:id',AuthService.authorize,(req:AuthenficatedRequest,res:Response)=>{
     LoggerService.info('[GET] /:id')
+    const loggedInUser = req.user;
     const id = Number(req.params.id);
     if(isNaN(id)){
         LoggerService.error("ID is not a valid number")
         return res.status(400).json({error : `Invalid id : ${id}`})
     }
 
+   
     const result : User | undefined = UsersService.getById(id);
     if(!result){
-        LoggerService.error("User not found")
+         LoggerService.info("User not found")
         return res.status(404).json({error: `User with id ${id} not found`})
     }
-    LoggerService.info("User found")
-    return res.status(200).json(UsersMapper.toDTO(result));
+    if(loggedInUser?.role === Erole.ADMIN ||  loggedInUser?.id === result?.id ){ 
+    return res.status(200).json(UsersMapper.toDTO(result))
+    }
+    return res.status(200).json(UsersMapper.toShortDTO(result));
+
 })
 
-usersController.put('/:id',(req:Request,res:Response)=>{
+usersController.put('/:id',AuthService.authorize,(req:AuthenficatedRequest,res:Response)=>{
     LoggerService.info('[PUT] /users/:id')
+    const loggedInUser = req.user;
 
     const id = Number(req.params.id);
     if(isNaN(id)){
@@ -141,39 +152,53 @@ usersController.put('/:id',(req:Request,res:Response)=>{
         return res.status(400).json({error : "ID in path and body don't match "})
     
     }
+
+    if(loggedInUser?.role !== Erole.ADMIN && loggedInUser?.id !== id){
+        LoggerService.error("Authenticated user is not an admin and tries to update another user")
+        return res.status(403).json({error : `Authenticated user is not an admin and tries to update another user`})
+    }
+
     const updatedUser : User | undefined = UsersService.update(UsersMapper.fromDTO(userDTO));
 
     if(!updatedUser){
         LoggerService.error("User not found");
         return res.status(404).json({error : `User with id ${id} not found`});
     }
-    //grave si je met At en non optionnel pour le dto ?
-    LoggerService.info("Updated user")
+
     return res.status(200).json(UsersMapper.toDTO(updatedUser));
 })
 
-
-usersController.delete('/:id',(req:Request,res:Response)=>{
-    LoggerService.info("[DELETE] /:id")
+usersController.delete('/:id',AuthService.authorize,(req:AuthenficatedRequest,res:Response)=>{
+    LoggerService.info("[DELETE] /:id");
+    const loggedInUser = req.user;
     const id = Number(req.params.id);
     
     if(isNaN(id)){
         LoggerService.error("ID is not a valid nubmer")
         return res.status(400).json({error : `Invalid ID : ${req.params.id}`})
     }
+    if(loggedInUser?.role !== Erole.ADMIN && loggedInUser?.id === id){
+        LoggerService.error("Authenticated user is not an admin")
+        return res.status(403).json({error : `Authenticated user is not an admin`})
+    }
     const deletedUser = UsersService.delete(id);
+    if(deletedUser?.role === Erole.ADMIN) {
+        LoggerService.error(" attempt to delete an admin account")
+        return res.status(400).json({error :`attempt to delete an admin account`})
+    }
 
     if(!deletedUser){
-        LoggerService.error(`User with id ${id} not found or is an Admin`)
-        return res.status(404).json({error : `User with id ${id} not found or is an Admin`})
+        LoggerService.error(`User with id ${id} not found `)
+        return res.status(404).json({error : `User with id ${id} not found`})
     }
         
     LoggerService.info(`User ${id} successfully soft-deleted`)
     return res.status(200).json(UsersMapper.toDTO(deletedUser))
 })
 
-usersController.patch('/:id/role/:role', (req: Request, res: Response) => {
+usersController.patch('/:id/role/:role',AuthService.authorize, (req: AuthenficatedRequest, res: Response) => {
     LoggerService.info("[PATCH] /:id/role/:role")
+    const loggedInUser = req.user;
     const id = Number(req.params.id);
     const role = req.params.role; 
 
@@ -183,6 +208,7 @@ usersController.patch('/:id/role/:role', (req: Request, res: Response) => {
     }
 
   
+    if(loggedInUser?.role === Erole.ADMIN){
     if (role !== Erole.ADMIN && role !== Erole.PLAYER && role !== Erole.REFEREE && role !== Erole.TRAINER) {
 
         LoggerService.error("Invalid role value")
@@ -191,18 +217,24 @@ usersController.patch('/:id/role/:role', (req: Request, res: Response) => {
 
     
     const updatedUser = UsersService.updateRole(id, role);
+    
 
+    if(updatedUser?.role === Erole.PLAYER){
+        LoggerService.error()
+    }
     if (!updatedUser) {
         LoggerService.error(`User with id ${id} not found or is not a player`)
         return res.status(400).json({ error: `User with id ${id} not found or is not a player` });
     }
 
      LoggerService.info(`Updated User ${id} with new role`)
-    return res.status(200).json(UsersMapper.toDTO(updatedUser));
-});
+     return res.status(200).json(UsersMapper.toDTO(updatedUser));
+    }});
 
-usersController.patch('/:id/reactivate', (req: Request, res: Response) => {
+    usersController.patch('/:id/reactivate',AuthService.authorize,(req: AuthenficatedRequest, res: Response) => {
     LoggerService.info("[PATCH] /:id/reactivate")
+    const loggedInUser = req.user;
+
     const id = Number(req.params.id);
 
    if(isNaN(id)){
@@ -210,7 +242,9 @@ usersController.patch('/:id/reactivate', (req: Request, res: Response) => {
         return res.status(400).json({error : `Invalid ID : ${req.params.id}`})
     }
 
+    if(loggedInUser?.role === Erole.ADMIN){
     const updatedUser = UsersService.reactivate(id);
+
 
     if (!updatedUser) {
         LoggerService.error(`Failed to reactivate user ${id}`);
@@ -219,4 +253,4 @@ usersController.patch('/:id/reactivate', (req: Request, res: Response) => {
 
     LoggerService.info(`User ${id} reactivated`);
     return res.status(200).send(); 
-});
+}});

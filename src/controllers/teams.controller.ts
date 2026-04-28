@@ -4,11 +4,13 @@ import { TeamsService } from "../services/teams.service";
 import { NewTeamDTO, Team, TeamDTO, TeamShortDTO } from "../models/team.model";
 import { TeamsMapper } from "../mappers/teams.mapper";
 import { isNewTeamDTO } from "../utils/guards";
+import { AuthService } from "../services/auth.service";
+import { AuthentificatedUser } from "../models/user.models";
 
 
 export const teamsController = Router();
 
-teamsController.get('/',(req:Request,res:Response)=>{
+teamsController.get('/',(req:Request,res:Response)=>{ // le req n'est pas utilisé ici ?
     LoggerService.info("[GET] /teams/");
     const teams = TeamsService.getAll();
     const teamsDTO : TeamShortDTO [] = []
@@ -19,7 +21,7 @@ for (let i = 0; i < teams.length; i++) {
 return res.status(200).json(teamsDTO);
 })
 
-teamsController.post('/',(req:Request,res:Response)=>{
+teamsController.post('/',AuthService.authorize,(req: Auth,res:Response)=>{
     LoggerService.info("[POST] /teams/")
     const teamDTO : NewTeamDTO = req.body;
 
