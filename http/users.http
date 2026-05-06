@@ -1,79 +1,443 @@
-###
-# Get all the users
-GET http://localhost:3000/users HTTP/1.1
-Authorization: Bearer {{}}
+### token's generation
+# log as administrator
+# @name admin_login
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+   "username": "admin",
+   "password": "admin"
+}
+
+### log as player
+# @name player_login
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+   "username": "player",
+   "password": "player"
+}
+
+### log as referee
+# @name referee_login
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+   "username": "ref",
+   "password": "ref"
+}
+
+###-------------------------------------------------------------------------
 
 ###
-# POST 
+# GET /users (No token -> 401 error)
+GET http://localhost:3000/users
+
+###
+# GET /users (Admin -> UserDTO[])
+GET http://localhost:3000/users
+Authorization: {{admin_login.response.body.token}}
+
+###
+# GET /users (Players -> UserShortDTO)
+GET http://localhost:3000/users
+Authorization: {{player_login.response.body.token}}
+
+###-------------------------------------------------------------------------
+
+### POST - Create user success → 201
 POST http://localhost:3000/users HTTP/1.1
 Content-Type: application/json
 
 {
-   "firstName" : "Diop",
-   "lastName" : "Sofiane",
-   "email" : "Souf@gmail.com",
-   "username" : "Souf",
-   "password" : "Souf1210"
+    "firstName": "Marwan",
+    "lastName": "Doe",
+    "email": "johEAZn@example.com",
+    "username": "johndoeArerza",
+    "password": "SecurePass123!"
 }
 
 
-###
-# POST with error
+### POST - Missing fields → 400
 POST http://localhost:3000/users HTTP/1.1
 Content-Type: application/json
 
 {
-   "lastName" : "Sofiane",
-   "email" : "Souf@gmail.com",
-   "username" : "Souf",
-   "password" : "Souf1210"
+    "firstName": "Marwan",
+    "lastName": "Doe"
 }
 
-###
-# GET an user by his username 
- GET http://localhost:3000/users/username/bob HTTP/1.1
 
- 
-###
-# GET an user by his username with error
- GET http://localhost:3000/users/username/Lolo HTTP/1.1
-
-
-
-###
- # GET an user by his email
- GET http://localhost:3000/users/email/Lolo@gmail.com
- 
-
-###
-# GET an user by his id 
-GET http://localhost:3000/users/999
-
-###
-# PUT 
-PUT http://localhost:3000/users/1
-Content-Type : application/json
+### POST - Duplicate email → 400
+POST http://localhost:3000/users HTTP/1.1
+Content-Type: application/json
 
 {
-   "id": 1,
-   "firstName": "Quentin",
-   "lastName" : "Emile",
-   "email": "quentin@gmail.com",
-   "username": "quentoux",
-   "role": "player",
-   "status": "active"
+    "firstName": "John",
+    "lastName": "Doe",
+    "email": "john@example.com",
+    "username": "johndoe4",
+    "password": "SecurePass123!"
+}
+
+### POST - Duplicate username → 400
+POST http://localhost:3000/users HTTP/1.1
+Content-Type: application/json
+
+{
+    "firstName": "John",
+    "lastName": "Doe",
+    "email": "other@example.com",
+    "username": "johndoe",
+    "password": "SecurePass123!"
+}
+
+
+### POST - Invalid email ( need . )  → 400
+POST http://localhost:3000/users HTTP/1.1
+Content-Type: application/json
+
+{
+    "firstName": "John",
+    "lastName": "Doe",
+    "email": "ezaeza@",
+    "username": "johndoe",
+    "password": "SecurePass123!"
+}
+
+### POST - Invalid email ( need @ )  → 400
+POST http://localhost:3000/users HTTP/1.1
+Content-Type: application/json
+
+{
+    "firstName": "John",
+    "lastName": "Doe",
+    "email": "ezaeza.",
+    "username": "johndoe",
+    "password": "SecurePass123!"
+}
+
+### POST - Invalid email ( need @ and . )  → 400
+POST http://localhost:3000/users HTTP/1.1
+Content-Type: application/json
+
+{
+    "firstName": "John",
+    "lastName": "Doe",
+    "email": "ezaeza.",
+    "username": "johndoe",
+    "password": "SecurePass123!"
+}
+
+
+###-------------------------------------------------------------------------
+
+###
+# GET /users/username/{username} (admin try -> 200)
+GET http://localhost:3000/users/username/admin
+Authorization: {{admin_login.response.body.token}}
+
+###
+# GET /users/username/{username} (referee try -> 200)
+GET http://localhost:3000/users/username/admin
+Authorization: {{referee_login.response.body.token}}
+
+###
+# GET /users/username/{username} (player try -> 401)
+GET http://localhost:3000/users/username/admin
+Authorization: {{player_login.response.body.token}}
+
+###
+# GET /users/username/{username} (no token -> 401)
+GET http://localhost:3000/users/username/admin
+
+###
+# GET /users/username/{username} (referee try but invalid username -> 404)
+GET http://localhost:3000/users/username/adminnnnnnnnn
+Authorization: {{referee_login.response.body.token}}
+
+###
+# GET /users/username/{username} (admin try but invalid username -> 404 )
+GET http://localhost:3000/users/username/adminnnnnnnnn
+Authorization: {{admin_login.response.body.token}}
+
+###-------------------------------------------------------------------------
+
+###
+# GET /users/email/{email} (admin try -> 200)
+GET http://localhost:3000/users/email/bob@example.com
+Authorization: {{admin_login.response.body.token}}
+
+###
+# GET /users/email/{email} (referee try -> 200)
+GET http://localhost:3000/users/email/bob@example.com
+Authorization: {{referee_login.response.body.token}}
+
+###
+# GET /users/email/{email} (player try -> 401)
+GET http://localhost:3000/users/email/bob@example.com
+Authorization: {{player_login.response.body.token}}
+
+###
+# GET /users/email/{email} (no token -> 401)
+GET http://localhost:3000/users/email/bob@example.com
+
+
+###
+# GET /users/email/{email} (admin try but invalid email -> 404)
+GET http://localhost:3000/users/email/bobEZAEZAEAZ@example.com
+Authorization: {{admin_login.response.body.token}}
+
+###-------------------------------------------------------------------------
+
+###
+# GET /users/{id} (admin view other or hisself -> UserDTO (200) )
+GET http://localhost:3000/users/13
+Authorization: {{admin_login.response.body.token}}
+
+
+###
+# GET /users/{id} (player view self -> UserDTO (200) )
+GET http://localhost:3000/users/2
+Authorization: {{player_login.response.body.token}}
+
+
+###
+# GET /users/{id} (player view other -> UserShortDTO (200))
+GET http://localhost:3000/users/1
+Authorization: {{player_login.response.body.token}}
+
+### GET /users/{id} - ID is not a valid number -> 400
+GET http://localhost:3000/users/abc
+Authorization: {{admin_login.response.body.token}}
+
+### GET /users/{id} - Not found -> 404
+GET http://localhost:3000/users/9999
+Authorization: {{admin_login.response.body.token}}
+
+###-------------------------------------------------------------------------
+
+### PUT /users/{id} - admin update an user ( any ) -> 200
+PUT http://localhost:3000/users/4
+Content-Type: application/json
+Authorization: {{admin_login.response.body.token}}
+
+{
+    "id": 4,
+    "firstName": "JohnUpdated",
+    "lastName": "Doe",
+    "email": "john@example.com",
+    "username": "johndoe",
+    "role" : "player",
+    "status" : "active"
+}
+
+### PUT /users/{id}- player update own profile -> 200
+PUT http://localhost:3000/users/2
+Content-Type: application/json
+Authorization: {{player_login.response.body.token}}
+
+{
+    "id": 2,
+    "firstName": "ezaejkaz",
+    "lastName": "Doe",
+    "email": "john@example.com",
+    "username": "johndoe",
+    "role" : "player",
+    "status" : "active"
+}
+
+
+### PUT /users/{id}- no token -> 401
+PUT http://localhost:3000/users/2
+Content-Type: application/json
+
+{
+    "id": 2,
+    "firstName": "ezaejkaz",
+    "lastName": "Doe",
+    "email": "john@example.com",
+    "username": "johndoe",
+    "role" : "player",
+    "status" : "active"
+}
+
+
+### PUT /users/{id}- not an admin and try to update another user -> 403
+PUT http://localhost:3000/users/5
+Content-Type: application/json
+Authorization: {{player_login.response.body.token}}
+
+{
+    "id": 5,
+    "firstName": "yousssss",
+    "lastName": "yousssss",
+    "email": "john@example.com",
+    "username": "johndoe",
+    "role" : "player",
+    "status" : "active"
+}
+
+
+### PUT /users/{id} - Body ID / Path ID mismatch -> 400
+PUT http://localhost:3000/users/2
+Content-Type: application/json
+Authorization: {{player_login.response.body.token}}
+
+{
+    "id": 5,
+    "firstName": "yousssss",
+    "lastName": "yousssss",
+    "email": "john@example.com",
+    "username": "johndoe",
+    "role" : "player",
+    "status" : "active"
+}
+
+
+### PUT /users/{id} - Invalid payload -> 400
+PUT http://localhost:3000/users/2
+Content-Type: application/json
+Authorization: {{player_login.response.body.token}}
+
+{
+    "username": "johndoe",
+    "role" : "player",
+    "status" : "active"
+}
+
+
+### PUT /users/{id}- user not found -> 404
+PUT http://localhost:3000/users/99999
+Content-Type: application/json
+Authorization: {{admin_login.response.body.token}}
+
+{
+    "id": 99999,
+    "firstName": "yousssss",
+    "lastName": "yousssss",
+    "email": "john@example.com",
+    "username": "johndoe",
+    "role" : "player",
+    "status" : "active"
 }
 
 ###
-#DELETE 
+# DELETE /users/{id} Self Delete -> 200
 DELETE http://localhost:3000/users/2
-Content-Type: application/json
+Authorization: {{player_login.response.body.token}}
 
 
 ###
-#PATCH
-PATCH  http://localhost:3000/users/1/role/admin
+# DELETE /users/{id} Admin delete any user-> 200
+DELETE http://localhost:3000/users/4
+Authorization: {{admin_login.response.body.token}}
 
 ###
-#PATCH 
-PATCH http://localhost:3000/users/999/reactivate
+# DELETE /users/{id} invalid id -400
+DELETE http://localhost:3000/users/afd
+Authorization: {{admin_login.response.body.token}}
+
+
+###
+# DELETE /users/{id} non admin try to delete an admin account -> 400
+DELETE http://localhost:3000/users/1
+Authorization: {{player_login.response.body.token}}
+
+
+###
+# DELETE /users/{id} no token -> 401
+DELETE http://localhost:3000/users/3
+
+
+###
+# DELETE /users/{id} Not an admin try to delete any ( not own ) account -> 403
+DELETE http://localhost:3000/users/5
+Authorization: {{player_login.response.body.token}}
+
+###
+# DELETE /users/{id} not found -> 404
+DELETE http://localhost:3000/users/999
+Authorization: {{admin_login.response.body.token}}
+
+### -----------------------------------------------------------------------
+
+###
+# PATCH /users/{id}/role/{role} admin change a player role to a trainer --> 200
+PATCH http://localhost:3000/users/2/role/trainer
+Authorization: {{admin_login.response.body.token}}
+
+###
+# PATCH /users/{id}/role/{role} admin change a player role to a referee --> 200
+PATCH http://localhost:3000/users/3/role/referee
+Authorization: {{admin_login.response.body.token}}
+
+
+###
+# PATCH /users/{id}/role/{role} admin change a player role to a admin --> 200
+PATCH http://localhost:3000/users/3/role/admin
+Authorization: {{admin_login.response.body.token}}
+
+###
+# PATCH /users/{id}/role/{role} invalid id -> 400
+PATCH http://localhost:3000/users/aze/role/trainer
+Authorization: {{admin_login.response.body.token}}
+
+###
+# PATCH /users/{id}/role/{role} invalid role value -> 400
+PATCH http://localhost:3000/users/6/role/caca
+Authorization: {{admin_login.response.body.token}}
+
+###
+# PATCH /users/{id}/role/{role} User not a player -> 400
+PATCH http://localhost:3000/users/5/role/trainer
+Authorization: {{admin_login.response.body.token}}
+
+###
+# PATCH /users/{id}/role/{role} no token -> 401
+PATCH http://localhost:3000/users/3/role/trainer
+
+###
+# PATCH /users/{id}/role/{role} authentificated user is not an admin -> 403
+PATCH http://localhost:3000/users/3/role/trainer
+Authorization: {{player_login.response.body.token}}
+
+
+###
+# PATCH /users/{id}/role/{role} UUser not found -> 404
+PATCH http://localhost:3000/users/53333/role/trainer
+Authorization: {{admin_login.response.body.token}}
+
+
+### --------------------------------------------------------------------
+
+###
+# PATCH /users/{id}/reactivate Admin reactivate a user not activated -> 200
+PATCH http://localhost:3000/users/7/reactivate
+Authorization: {{admin_login.response.body.token}}
+
+
+###
+# PATCH /users/{id}/reactivate no token -> 401
+PATCH http://localhost:3000/users/7/reactivate
+
+###
+# PATCH /users/{id}/reactivate Authentificated user is not an admin -> 403
+PATCH http://localhost:3000/users/7/reactivate
+Authorization: {{player_login.response.body.token}}
+
+###
+# PATCH /users/{id}/reactivate Authentificated user is not an admin -> 403
+PATCH http://localhost:3000/users/7/reactivate
+Authorization: {{referee_login.response.body.token}}
+
+
+###
+# PATCH /users/{id}/reactivate user not found -> 404
+PATCH http://localhost:3000/users/9999/reactivate
+Authorization: {{admin_login.response.body.token}}
+
+
+

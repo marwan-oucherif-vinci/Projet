@@ -1,7 +1,5 @@
-import e from "express";
 import { TeamsMapper } from "../mappers/teams.mapper";
-import { NewTeam, NewTeamDTO, Team, TeamDBO } from "../models/team.model";
-import { User } from "../models/user.models";
+import { NewTeam, Team, TeamDBO } from "../models/team.model";
 import { FilesService } from "./files.service";
 import { LoggerService } from "./logger.service";
 
@@ -26,6 +24,16 @@ export class TeamsService {
     }
 
 
+    static getOwnTeams(userId : number): Team[] {
+        const allTeams = this.readTeamsDB();
+        const ownTeam : Team[] = []
+        for (let i = 0; i < allTeams.length; i++) {
+            if(allTeams[i].trainerId === userId || allTeams[i].players.includes(userId)){
+                ownTeam.push(allTeams[i])
+            }
+        }
+        return ownTeam;
+    }
     
     static getAll(): Team[]{
             return this.readTeamsDB();
@@ -49,13 +57,20 @@ export class TeamsService {
         
         }
 
-    static create(team:NewTeam) : Team | undefined {
+    static create(team:NewTeam, trainerId : number) : Team | undefined | "Name Already Exists"{
         const teamsDB : Team [] = this.readTeamsDB();
+        for (let i = 0; i < teamsDB.length; i++) {
+            if(teamsDB[i].name === team.name){
+                LoggerService.error("Team name already exists")
+                return "Name Already Exists"
+            }
+            
+        }
 
         const newTeam : Team = {
             id : teamsDB.length + 1,
             players :  [],
-            trainerId : 1,
+            trainerId : trainerId,
             name : team.name,
             description : team.description,
             sportType : team.sportType,
@@ -64,6 +79,8 @@ export class TeamsService {
             
 
         }
+       
+       
         teamsDB.push(newTeam);
 
         if(!TeamsService.writeTeamsDB(teamsDB)){
@@ -85,7 +102,7 @@ export class TeamsService {
         return undefined;
     } 
     
-    public static update (updatedTeam : Team ) : Team | undefined {
+    public static update (updatedTeam : Team, trainerId : number) : Team | undefined {
         const teams : Team[] = TeamsService.readTeamsDB();
         let index = -1;
         for (let i = 0; i < teams.length; i++) {
@@ -97,8 +114,10 @@ export class TeamsService {
         }
         if (index === -1) return undefined;
 
+        updatedTeam.trainerId = trainerId;
         updatedTeam.createdAt = teams[index].createdAt;
         updatedTeam.updatedAt = new Date();
+        
 
         teams[index] = updatedTeam;
         

@@ -1,6 +1,8 @@
 import { describe } from "node:test";
 import { NewTeam, NewTeamDTO, Team, TeamDBO, TeamDTO, TeamShortDTO } from "../models/team.model";
 import { LoggerService } from "../services/logger.service";
+import { UsersService } from "../services/users.service";
+import { UsersMapper } from "./users.mapper";
 
 export class TeamsMapper {
     static fromDBO(dbo : TeamDBO): Team{
@@ -75,6 +77,29 @@ export class TeamsMapper {
                                    updatedAt : new Date(dto.updatedAt)
                             }
                         }
+                static toFullDTO(team: Team): any {
+                         const trainerUser = UsersService.getById(team.trainerId);
+                                const trainerObj = trainerUser ? UsersMapper.toShortDTO(trainerUser) : null;
+
+                                const resolvedPlayers = [];
+                                for (let i = 0; i < team.players.length; i++) {
+                                    const p = UsersService.getById(team.players[i]);
+                                    if (p) {
+                                        resolvedPlayers.push(UsersMapper.toShortDTO(p));
+                                    }
+                                }
+
+                                return {
+                                    id: team.id,
+                                    name: team.name,
+                                    description: team.description,
+                                    sportType: team.sportType,
+                                    players: resolvedPlayers, 
+                                    trainer: trainerObj,      
+                                    createdAt: team.createdAt,
+                                    updatedAt: team.updatedAt
+                                };
+                            }
                     
                     }
 

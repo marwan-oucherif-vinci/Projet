@@ -28,7 +28,7 @@ export enum ESportType {
     FOOTBALL = 'football',
     BASKETBALL = 'basketball',
     TENNIS = 'tennis',
-    VOLLEYBALL = 'voleyball',
+    VOLLEYBALL = 'volleyball',
     HOCKEY = 'hockey'
 }
 

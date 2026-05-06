@@ -1,14 +1,14 @@
 import { GamesMapper } from "../mappers/games.mapper";
-import { TeamsMapper } from "../mappers/teams.mapper";
 import {
   EGameStatus,
   Game,
   GameDBO,
-  GameShortDTO,
   NewGame,
 } from "../models/game.model";
+import { Erole } from "../models/user.models";
 import { FilesService } from "./files.service";
 import { LoggerService } from "./logger.service";
+import { TeamsService } from "./teams.service";
 
 export class GamesService {
   private static dbPath = "./data/games.json";
@@ -48,8 +48,32 @@ export class GamesService {
     }
   }
 
-  public static create(game: NewGame): Game | undefined {
+  public static create(game: NewGame, refereeId : number): Game | undefined | string{
     const gamesDB: Game[] = this.readGamesDB();
+    
+    if(game.homeTeamId && game.awayTeamId && game.homeTeamId === game.awayTeamId) {
+      return "Same Team";
+    }
+
+    if(game.homeTeamId && game.awayTeamId){
+    const teamA = TeamsService.getById(game.homeTeamId);
+    const teamB = TeamsService.getById(game.awayTeamId);
+    if(teamA?.sportType !== teamB?.sportType){
+      return "Sport Mismatch";
+    }
+  }
+
+  if(game.fieldId && game.scheduledDate){
+    for (let i = 0; i < gamesDB.length; i++) {
+      if(gamesDB[i].fieldId === game.fieldId){
+        if(gamesDB[i].scheduledDate === game.scheduledDate){
+          if(gamesDB[i].status !== EGameStatus.CANCELLED){
+            return "Field Already Booked"
+          }
+        }
+      }
+    }
+  }
 
     let initialStatus = EGameStatus.CREATED;
     if (game.fieldId && game.scheduledDate) {
@@ -61,7 +85,7 @@ export class GamesService {
       status: initialStatus,
       name: game.name,
       fieldId: game.fieldId,
-      refereeId: game.refereeId,
+      refereeId: refereeId,
       homeTeamId: game.homeTeamId,
       awayTeamId: game.awayTeamId,
       scheduledDate: game.scheduledDate,
@@ -108,13 +132,18 @@ export class GamesService {
       return undefined;
     }
     game.status = gamesDB[index].status;
+    game.homeScore = gamesDB[index].homeScore;
+    game.awayScore = gamesDB[index].awayScore;
+    if(!game.refereeId){
+      game.refereeId = gamesDB[index].refereeId
+    }
     if (
       game.status === EGameStatus.CREATED &&
       game.scheduledDate != undefined &&
       game.fieldId != undefined
     ) {
       for (const gameAlreadyIn of gamesDB) {
-        if (game.id != gameAlreadyIn.id && gameAlreadyIn.fieldId === game.fieldId && gameAlreadyIn.scheduledDate == game.scheduledDate ) {
+        if (game.id != gameAlreadyIn.id && gameAlreadyIn.fieldId === game.fieldId && gameAlreadyIn.scheduledDate == game.scheduledDate && gameAlreadyIn.status !== EGameStatus.CANCELLED && gameAlreadyIn.status !== EGameStatus.FINISHED) {
           LoggerService.error("field in use");
           return undefined;
         }
@@ -178,7 +207,7 @@ export class GamesService {
     gamesDB[index].awayScore = awayScore;
     gamesDB[index].updatedAt = new Date();
 
-    if (!this.readGamesDB) {
+    if (!this.writeGamesDB(gamesDB)) {
       return undefined;
     }
     return gamesDB[index];

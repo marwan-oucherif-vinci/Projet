@@ -3,6 +3,7 @@ import { usersController } from './controllers/users.controller';
 import { teamsController } from './controllers/teams.controller';
 import { gamesController } from './controllers/games.controller';
 import { fieldsController } from './controllers/fields.controller';
+import { authController } from './controllers/auth.controller';
 
 export const app : Express = express();
 
@@ -32,3 +33,4 @@ app.use('/users', usersController);
 app.use('/teams', teamsController);
 app.use('/fields',fieldsController)
 app.use('/games', gamesController);
+app.use('/auth',authController);

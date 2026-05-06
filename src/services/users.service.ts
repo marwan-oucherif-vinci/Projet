@@ -1,4 +1,4 @@
-import { Erole, EUserStatus, NewUser, NewUserDTO, User, UserDBO } from "../models/user.models";
+import { Erole, EUserStatus, NewUser, User, UserDBO } from "../models/user.models";
 import { FilesService } from "./files.service";
 import { LoggerService } from "./logger.service";
 import { UsersMapper } from "../mappers/users.mapper";
@@ -55,7 +55,7 @@ export class UsersService {
 
 
     // the user : NewUser is like NewUserDtO, just we have some rules to respect (tasks are split), but in the logic, the have the same attribut and roles
-    static create (user : NewUser) : User | undefined {
+    static create (user : NewUser) : User | undefined | "Invalid_Email" {
         const usersDB : User [] = this.readUsersDB(); 
 
         
@@ -69,7 +69,10 @@ export class UsersService {
         if(isDuplicated){
             LoggerService.error("User already exists with this email or username ")
             return undefined;
-
+        }
+        if(!user.email.includes(".") || !user.email.includes("@")){
+            LoggerService.error("Invalid format, need '@' and/or '.' ")
+            return "Invalid_Email";
         }
         
         const password = bcrypt.hashSync(user.password,10);
@@ -125,7 +128,7 @@ export class UsersService {
         }
         return undefined;
     }
-    public static update(user:User) : User | undefined {
+    public static update(user:User,userRole : Erole) : User | undefined {
         const data: User [] = UsersService.readUsersDB();
         let index = -1;
 
@@ -142,8 +145,11 @@ export class UsersService {
         user.updatedAt = new Date();
 
         user.password = data[index].password;
+        if(userRole !== Erole.ADMIN){
         user.role = data[index].role;
         user.status = data[index].status;
+        }
+        
 
         data[index] = user;
 
@@ -177,7 +183,7 @@ export class UsersService {
 
 }
 
-public static updateRole(id: number, newRole: Erole): User | undefined {
+public static updateRole(id: number, newRole: Erole): User | undefined | "Not a player"{
     const data: User[] = UsersService.readUsersDB();
     let index = -1;
 
@@ -192,7 +198,7 @@ public static updateRole(id: number, newRole: Erole): User | undefined {
 
   
     if (data[index].role !== Erole.PLAYER) {
-        return undefined; 
+        return "Not a player"; 
     }
 
     data[index].role = newRole;

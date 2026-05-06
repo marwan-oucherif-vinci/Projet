@@ -2,7 +2,7 @@ import { FieldDTO, NewFieldDTO } from "../models/field.model";
 import { EGameStatus, GameDTO, NewGameDTO } from "../models/game.model";
 // import { EGameStatus, GameDTO, NewGameDTO } from "../models/game.model";
 // import { ESportType, NewTeamDTO, TeamDTO } from "../models/team.model";
-import { ESportType } from "../models/team.model";
+import { ESportType, TeamDTO } from "../models/team.model";
 import { EUserStatus, NewUserDTO, UserDTO } from "../models/user.models";
 import { Erole } from "../models/user.models";
 import {  UserLoginDTO } from "../models/user.models";
@@ -15,9 +15,9 @@ export function isString(obj: any): obj is string {
   return typeof obj === 'string';
 }
 
-// function isObject(obj: any): obj is object {
-//   return typeof obj === 'object';
-// }
+function isObject(obj: any): obj is object {
+  return typeof obj === 'object';
+}
 
 export function isNonEmptyString(obj: any): obj is string {
   return isString(obj) && obj.trim().length !== 0;
@@ -70,15 +70,15 @@ export function isNewTeamDTO(obj: any): obj is NewUserDTO {
     (!obj.description || isString(obj.description))
 }
 
-// export function isTeamDTO(obj: any): obj is TeamDTO {
-//   return obj && typeof obj === 'object' && 
-//     obj.id !== undefined && isNumber(obj.id) && 
-//     obj.name && isNonEmptyString(obj.name) && 
-//     obj.sportType && isString(obj.sportType) && isESportType(obj.sportType) && 
-//     (!obj.description || isString(obj.description)) && 
-//     obj.players && isObject(obj.players) && 
-//     obj.trainerId && isNumber(obj.trainerId);
-// }
+export function isTeamDTO(obj: any): obj is TeamDTO {
+  return obj && typeof obj === 'object' && 
+    obj.id !== undefined && isNumber(obj.id) && 
+    obj.name && isNonEmptyString(obj.name) && 
+    obj.sportType && isString(obj.sportType) && isESportType(obj.sportType) && 
+    (!obj.description || isString(obj.description)) && 
+    obj.players && isObject(obj.players) && 
+    obj.trainerId && isNumber(obj.trainerId);
+}
 
 // == GAME ==
 export function isNewGameDTO(obj: any): obj is NewGameDTO {

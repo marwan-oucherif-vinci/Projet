@@ -10,13 +10,14 @@ import { UsersService } from "../services/users.service";
 export const authController = Router();
 
 authController.post("/login", (req:Request, res:Response)=>{
-    const username = req.body.username;
-    const password = req.body.password;
+    const loginData = req.body
 
-    if(!isUserLoginDTO(username) || !isUserLoginDTO(password)){
+    if(!isUserLoginDTO(loginData)){
         LoggerService.error("Missing or empty username / password");
-        res.status(400).json("Missing or empty username / password")
+        return res.status(400).json("Missing or empty username / password")
     }
+    const username = loginData.username;
+    const password = loginData.password;
     
 
     const authUser = AuthService.login(username,password); // 

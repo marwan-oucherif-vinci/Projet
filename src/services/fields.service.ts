@@ -1,11 +1,7 @@
 import { FieldsMapper } from "../mappers/fields.mapper";
-import { Field, FieldDBO, FieldDTO, NewField, NewFieldDTO } from "../models/field.model";
-import { Game } from "../models/game.model";
-import { Team } from "../models/team.model";
-import { UserDBO } from "../models/user.models";
+import { Field, FieldDBO, NewField} from "../models/field.model";
 import { FilesService } from "./files.service";
 import { LoggerService } from "./logger.service";
-import { TeamsService } from "./teams.service";
 
 export class FieldsService {
     private static dbPath = './data/fields.json'
@@ -96,6 +92,7 @@ export class FieldsService {
     }
     if(index === -1) return undefined;
 
+    updatedField.id = fields[index].id
     updatedField.createdAt = fields[index].createdAt;
     updatedField.updatedAt = new Date();
 

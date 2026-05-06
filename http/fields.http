@@ -1,10 +1,55 @@
-###
-# Get a list of fieldsDTO
-GET http://localhost:3000/fields/
+### token's generation
+# log as administrator
+# @name admin_login
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+   "username": "admin",
+   "password": "admin"
+}
+
+### log as player
+# @name player_login
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+   "username": "player",
+   "password": "player"
+}
+
+### log as referee
+# @name referee_login
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+   "username": "ref",
+   "password": "ref"
+}
+
+### log as trainer
+# @name trainer_login
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+   "username": "trainer",
+   "password": "trainer"
+}
+
 
 ###
-# Create a new field
+# Get a list of fieldsDTO, no auth required -> 200
+GET http://localhost:3000/fields/
+
+###-----------------------------------------------------------------------
+
+###
+# POST /fields admin create a new field -> 200
 POST http://localhost:3000/fields
+Authorization: {{admin_login.response.body.token}}
 Content-Type : Application/json
 
 {
@@ -13,16 +58,181 @@ Content-Type : Application/json
 }
 
 ###
-# Get a field with his id 
+# POST /fields ref create a new field -> 403
+POST http://localhost:3000/fields
+Authorization: {{referee_login.response.body.token}}
+Content-Type : Application/json
+
+{
+    "name" : "Marw",
+    "location" : "Bruxelles"
+}
+
+###
+# POST /fields player create a new field -> 403
+POST http://localhost:3000/fields
+Authorization: {{player_login.response.body.token}}
+Content-Type : Application/json
+
+{
+    "name" : "Marw",
+    "location" : "Bruxelles"
+}
+
+###
+# POST /fields trainer create a new field -> 403
+POST http://localhost:3000/fields
+Authorization: {{trainer_login.response.body.token}}
+Content-Type : Application/json
+
+{
+    "name" : "Marw",
+    "location" : "Bruxelles"
+}
+
+
+###
+# POST /fields admin create a new field but name is missing -> 400
+POST http://localhost:3000/fields
+Authorization: {{admin_login.response.body.token}}
+Content-Type : Application/json
+
+{
+    "location" : "Bruxelles"
+}
+
+###
+# POST /fields admin create a new field but location is missing -> 400
+POST http://localhost:3000/fields
+Authorization: {{admin_login.response.body.token}}
+Content-Type : Application/json
+
+{
+    "name" : "lkalala"
+}
+
+###
+# POST no token create a field -> 401
+POST http://localhost:3000/fields
+Content-Type : Application/json
+
+{
+    "name" : "jajezka",
+    "location" : "Bruxelles"
+}
+
+### ----------------------------------------------------------------------------------
+
+###
+# Get a field with his id -> 200
 GET http://localhost:3000/fields/1
 
 ###
-# Update a field
+# Get a field with id invalid -> 400
+GET http://localhost:3000/fields/aczea
+
+###
+# Get a field doesn't exist -> 404
+GET http://localhost:3000/fields/19999
+
+
+### ----------------------------------------------------------------------------------
+
+###
+# Admin update a field -> 200
+PUT http://localhost:3000/fields/1
+Authorization: {{admin_login.response.body.token}}
+Content-Type: application/json
+
+{
+    "id" : 1,
+    "name": "Mrnnn",
+    "location": "scucusuu"
+}
+
+###
+# Admin update a field but invalid payload -> 400
+PUT http://localhost:3000/fields/1
+Authorization: {{admin_login.response.body.token}}
+Content-Type: application/json
+
+{
+    "name": "Mrnnn",
+    "location": "scucusuu"
+}
+
+###
+# Admin update a field but id mismatch -> 400
+PUT http://localhost:3000/fields/4
+Authorization: {{admin_login.response.body.token}}
+Content-Type: application/json
+
+{
+    "id" : 1,
+    "name": "Mrnnn",
+    "location": "scucusuu"
+}
+
+###
+# NO TOKEN update a field -> 401
 PUT http://localhost:3000/fields/1
 Content-Type: application/json
 
 {
     "id" : 1,
+    "name": "Mrnnn",
+    "location": "scucusuu"
+}
+
+###
+# Not a admin update a field ( trainer ) -> 403
+PUT http://localhost:3000/fields/1
+Authorization: {{trainer_login.response.body.token}}
+Content-Type: application/json
+
+{
+    "id" : 1,
+    "name": "Mrnnn",
+    "location": "scucusuu"
+}
+
+
+
+###
+# Not a admin update a field ( player ) -> 403
+PUT http://localhost:3000/fields/1
+Authorization: {{player_login.response.body.token}}
+Content-Type: application/json
+
+{
+    "id" : 1,
+    "name": "Mrnnn",
+    "location": "scucusuu"
+}
+
+
+###
+# Not a admin update a field ( referee ) -> 403
+PUT http://localhost:3000/fields/1
+Authorization: {{referee_login.response.body.token}}
+Content-Type: application/json
+
+{
+    "id" : 1,
+    "name": "Mrnnn",
+    "location": "scucusuu"
+}
+
+
+
+###
+# admin update a field but not found -> 404
+PUT http://localhost:3000/fields/999
+Authorization: {{admin_login.response.body.token}}
+Content-Type: application/json
+
+{
+    "id" : 999,
     "name": "Mrnnn",
     "location": "scucusuu"
 }

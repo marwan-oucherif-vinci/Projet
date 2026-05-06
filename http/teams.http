@@ -1,9 +1,78 @@
-###
-# GET All teams 
-GET http://localhost:3000/teams/
+### token's generation
+# log as administrator
+# @name admin_login
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+   "username": "admin",
+   "password": "admin"
+}
+
+### log as player
+# @name player_login
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+   "username": "player",
+   "password": "player"
+}
+
+### log as referee
+# @name referee_login
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+   "username": "ref",
+   "password": "ref"
+}
+
+### log as trainer
+# @name trainer_login
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+   "username": "trainer",
+   "password": "trainer"
+}
+
+
 
 ###
-# POST a new team
+# GET All teams ( no auth required )
+GET http://localhost:3000/teams/
+
+### --------------------------------------------------------------------
+
+
+###
+# POST /teams - Trainer -> 201
+POST http://localhost:3000/teams/
+Authorization: {{trainer_login.response.body.token}}
+Content-Type: application/json
+
+{
+  "name": "Red Dragons",
+  "description": "A competitive football team",
+  "sportType": "football"
+}
+
+###
+# POST /teams - inalid or missing fields -> 400
+POST http://localhost:3000/teams/
+Authorization: {{trainer_login.response.body.token}}
+Content-Type: application/json
+
+{
+  "description": "A competitive football team",
+  "sportType": "football"
+}
+
+###
+# POST /teams - no tokern -> 401
 POST http://localhost:3000/teams/
 Content-Type: application/json
 
@@ -14,13 +83,219 @@ Content-Type: application/json
 }
 
 ###
-# GET a team with an id 
+# POST /teams - Authentificated User is not a trainer -> 403
+POST http://localhost:3000/teams/
+Authorization: {{player_login.response.body.token}}
+Content-Type: application/json
+
+{
+  "name": "Red Dragons",
+  "description": "A competitive football team",
+  "sportType": "football"
+}
+
+###
+# POST /teams - Authentificated User is not a trainer -> 403
+POST http://localhost:3000/teams/
+Authorization: {{admin_login.response.body.token}}
+Content-Type: application/json
+
+{
+  "name": "Red Dragons",
+  "description": "A competitive football team",
+  "sportType": "football"
+}
+
+###
+# POST /teams - team name already exists
+POST http://localhost:3000/teams/
+Authorization: {{trainer_login.response.body.token}}
+Content-Type: application/json
+
+{
+  "name": "Red Dragons",
+  "description": "A competitive football team",
+  "sportType": "football"
+}
+
+### -----------------------------------------------------------------------
+
+###
+# GET /teams/own - Get teams, Any auth user (player ) -> 200
+GET http://localhost:3000/teams/own
+Authorization: {{player_login.response.body.token}}
+
+###
+# GET /teams/own - Get teams for a referee  (200)
+GET http://localhost:3000/teams/own
+Authorization: {{referee_login.response.body.token}}
+
+###
+# GET /teams/own - Get teams for a admin (200)
+GET http://localhost:3000/teams/own
+Authorization: {{admin_login.response.body.token}}
+
+###
+# GET /teams/own - Get teams for a trainer (200)
+GET http://localhost:3000/teams/own
+Authorization: {{trainer_login.response.body.token}}
+
+###
+# GET /teams/own - No token -> 401
+GET http://localhost:3000/teams/own
+
+### ----------------------------------------------------------------------------
+
+###
+# GET a team with an id correct -> 200
+GET http://localhost:3000/teams/1
+
+###
+# GET a team with an id not valid -> 400
+GET http://localhost:3000/teams/1EZAEAZ
+
+###
+# GET a team with no team with that ID exists. -> 404
 GET http://localhost:3000/teams/999
+
+### -------------------------------------------------------------------------
+
+###
+# PUT trainer update an team and he's the trainer of this team  -> 200
+PUT http://localhost:3000/teams/1
+Authorization: {{trainer_login.response.body.token}}
+Content-Type : application/json
+
+{
+  "id": 1,
+  "name": "Larwab FC",
+  "description": "Siu",
+  "sportType": "caca",
+  "players": [
+      2,
+      3,
+      10
+    ],
+  "trainerId": 6 
+}
 
 
 ###
-# Update an team with id
+# PUT trainer update an team with invalid id -> 400
+PUT http://localhost:3000/teams/eaz
+Authorization: {{trainer_login.response.body.token}}
+Content-Type : application/json
+
+{
+  "id": 1,
+  "name": "Red Dragons FC",
+  "description": "Updated description",
+  "sportType": "football",
+  "players": [
+      2,
+      3,
+      10
+    ],
+  "trainerId": 5
+}
+
+###
+# PUT trainer update an team with invalid payload -> 400
+PUT http://localhost:3000/teams/1
+Authorization: {{trainer_login.response.body.token}}
+Content-Type : application/json
+
+{
+  "sportType": "football",
+  "players": [
+      2,
+      3,
+      10
+    ],
+  "trainerId": 5
+}
+
+
+###
+# PUT no token -> 401
+PUT http://localhost:3000/teams/eaz
+Content-Type : application/json
+
+{
+  "id": 1,
+  "name": "Red Dragons FC",
+  "description": "Updated description",
+  "sportType": "football",
+  "players": [
+      2,
+      3,
+      10
+    ],
+  "trainerId": 5
+}
+
+
+###
+# PUT Authentificated user is not a trainer -> 403
+PUT http://localhost:3000/teams/1
+Authorization: {{player_login.response.body.token}}
+Content-Type : application/json
+
+{
+  "id": 1,
+  "name": "Red Dragons FC",
+  "description": "Updated description",
+  "sportType": "football",
+  "players": [
+      2,
+      3,
+      10
+    ],
+  "trainerId": 5
+}
+
+###
+# PUT Authentificated user is not a trainer -> 403
+PUT http://localhost:3000/teams/1
+Authorization: {{referee_login.response.body.token}}
+Content-Type : application/json
+
+{
+  "id": 1,
+  "name": "Red Dragons FC",
+  "description": "Updated description",
+  "sportType": "football",
+  "players": [
+      2,
+      3,
+      10
+    ],
+  "trainerId": 5
+}
+
+###
+# PUT Authentificated user is not a trainer -> 403
+PUT http://localhost:3000/teams/1
+Authorization: {{admin_login.response.body.token}}
+Content-Type : application/json
+
+{
+  "id": 1,
+  "name": "Red Dragons FC",
+  "description": "Updated description",
+  "sportType": "football",
+  "players": [
+      2,
+      3,
+      10
+    ],
+  "trainerId": 5
+}
+
+###
+# PUT TEAM not found -> 404
 PUT http://localhost:3000/teams/999
+Authorization: {{trainer_login.response.body.token}}
 Content-Type : application/json
 
 {
@@ -37,11 +312,89 @@ Content-Type : application/json
 }
 
 ###
-# Join a team 
-PATCH http://localhost:3000/teams/999/join
-Content-Type: application/json
+# PUT trainer tried to update a team but he's not the trainer of this team 
+PUT http://localhost:3000/teams/2
+Authorization: {{trainer_login.response.body.token}}
+Content-Type : application/json
+
+{
+  "id": 2,
+  "name": "Red Dragons FC",
+  "description": "Updated description",
+  "sportType": "football",
+  "players": [
+      2,
+      3,
+      10
+    ],
+  "trainerId": 5
+}
 
 ###
-# Leave a team 
+# PATCH Any authentificated user ( trainer here ) join a team -> 200
+PATCH http://localhost:3000/teams/3/join
+Authorization: {{trainer_login.response.body.token}}
+
+###
+# PATCH Any authentificated user ( trainer here ) join a team but already in-> 400
+PATCH http://localhost:3000/teams/3/join
+Authorization: {{trainer_login.response.body.token}}
+
+
+###
+# PATCH Any authentificated user ( player here ) join a team -> 200
+PATCH http://localhost:3000/teams/2/join
+Authorization: {{player_login.response.body.token}}
+
+###
+# PATCH Any authentificated user ( player here ) join a team but already in-> 400
+PATCH http://localhost:3000/teams/2/join
+Authorization: {{player_login.response.body.token}}
+
+
+###
+# PATCH no token join a team -> 401
+PATCH http://localhost:3000/teams/2/join
+
+
+###
+# PATCH join a team that doesn't exist ( not found ) -> 404
+PATCH http://localhost:3000/teams/444/join
+Authorization: {{player_login.response.body.token}}
+
+
+
+###
+# PATCH TRAINER can't leave his team -> 403
+PATCH http://localhost:3000/teams/1/leave
+Authorization: {{trainer_login.response.body.token}}
+
+###
+# PATCH Any authentificated user ( player here ) leave his team -> 200
 PATCH http://localhost:3000/teams/2/leave
-Content-Type: application/json
+Authorization: {{player_login.response.body.token}}
+
+###
+# PATCH Any authentificated user ( player here ) leave a team but not a member-> 404
+PATCH http://localhost:3000/teams/2/leave
+Authorization: {{player_login.response.body.token}}
+
+
+###
+# PATCH no token leave a team -> 401
+PATCH http://localhost:3000/teams/2/leave
+
+
+###
+# PATCH leave a team that doesn't exist ( not found ) -> 404
+PATCH http://localhost:3000/teams/444/leave
+Authorization: {{player_login.response.body.token}}
+
+
+
+
+
+
+
+
+
